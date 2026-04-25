@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+<meta name="theme-color" content="#fff7e6" />
+<title>かけいちょ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Mochiy+Pop+P+One&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --paper: #fffbf0;
+  --ink: #3a2a18;
+  --accent: #ff6b35;
+  --accent-2: #ffb84d;
+  --green: #4fb56a;
+  --red: #e35457;
+  --blue: #4a94e0;
+  --line: #ead8b3;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+body {
+  font-family: "Kosugi Maru", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(800px 500px at 20% 10%, rgba(255,200,100,0.35), transparent 70%),
+    radial-gradient(800px 500px at 80% 90%, rgba(180,210,255,0.35), transparent 70%),
+    linear-gradient(180deg, #fff4d6, #ffe5b8);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+#app {
+  display: flex; flex-direction: column;
+  height: 100dvh; padding: 8px 12px 14px; gap: 8px;
+  max-width: 520px; margin: 0 auto;
+}
+header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.title {
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 22px;
+  color: var(--accent);
+  -webkit-text-stroke: 2.5px #fff; paint-order: stroke fill;
+  text-shadow: 3px 3px 0 var(--ink), 5px 5px 0 var(--accent-2);
+  margin: 0; transform: rotate(-2deg);
+}
+.icon-btn {
+  background: #fff; border: 2.5px solid var(--ink); color: var(--ink);
+  padding: 5px 10px; border-radius: 999px; font-size: 13px; font-weight: 900; cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.icon-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+
+/* Month switcher */
+.month-bar {
+  display: grid; grid-template-columns: 40px 1fr 40px;
+  background: #fff; border: 3px solid var(--ink); border-radius: 14px;
+  padding: 6px; box-shadow: 3px 3px 0 var(--ink);
+  align-items: center; text-align: center;
+}
+.month-bar button {
+  background: none; border: 0; font-size: 22px; color: var(--ink); cursor: pointer; line-height: 1;
+}
+.month-bar button:active { transform: scale(0.85); }
+.month-bar .ym {
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 22px; line-height: 1; color: var(--accent);
+}
+
+/* Summary cards */
+.summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.sum-card {
+  background: #fff; border: 2.5px solid var(--ink); border-radius: 12px;
+  padding: 8px; text-align: center; box-shadow: 2px 2px 0 var(--ink);
+}
+.sum-card .lbl { font-size: 10px; color: var(--ink); opacity: 0.7; letter-spacing: 0.1em; }
+.sum-card .val {
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 18px; margin-top: 2px; font-variant-numeric: tabular-nums;
+}
+.sum-card.income .val { color: var(--green); }
+.sum-card.expense .val { color: var(--red); }
+.sum-card.balance .val { color: var(--blue); }
+
+/* Category chart */
+.chart-card {
+  background: #fff; border: 2.5px solid var(--ink); border-radius: 14px;
+  padding: 10px 12px; box-shadow: 2px 2px 0 var(--ink);
+}
+.chart-card h3 {
+  margin: 0 0 6px;
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 13px; color: var(--accent);
+}
+.cat-row {
+  display: grid; grid-template-columns: 70px 1fr 70px;
+  align-items: center; gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+.cat-row .label { display: flex; align-items: center; gap: 4px; }
+.cat-row .label .dot {
+  width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1.5px solid var(--ink);
+}
+.cat-row .bar-wrap {
+  background: #f5e8c8; border-radius: 999px; height: 8px; overflow: hidden;
+  border: 1.5px solid var(--ink);
+}
+.cat-row .bar { height: 100%; }
+.cat-row .amt {
+  text-align: right; font-family: "Mochiy Pop P One", sans-serif; font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.cat-empty { font-size: 12px; opacity: 0.55; text-align: center; padding: 12px 0; }
+
+/* Records list */
+.list-wrap {
+  flex: 1 1 auto; min-height: 100px; overflow-y: auto;
+  background: #fff; border: 2.5px solid var(--ink); border-radius: 14px;
+  box-shadow: 2px 2px 0 var(--ink);
+  padding: 6px;
+}
+.list-wrap h3 {
+  margin: 4px 6px 6px;
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 13px; color: var(--accent);
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.list-wrap h3 .count { font-size: 11px; color: var(--ink); opacity: 0.55; }
+.rec {
+  display: grid; grid-template-columns: 38px 1fr auto auto;
+  align-items: center; gap: 8px;
+  padding: 8px 6px; border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+.rec:first-of-type { border-top: 0; }
+.rec .icon {
+  width: 32px; height: 32px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; border: 2px solid var(--ink);
+}
+.rec .meta { min-width: 0; }
+.rec .meta .cat {
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 13px;
+}
+.rec .meta .note {
+  font-size: 11px; color: var(--ink); opacity: 0.6;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rec .date { font-size: 10px; opacity: 0.55; font-variant-numeric: tabular-nums; }
+.rec .amt {
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.rec.income .amt { color: var(--green); }
+.rec.expense .amt { color: var(--red); }
+.rec .del {
+  background: none; border: 0; color: #aaa; cursor: pointer;
+  padding: 0 4px; font-size: 14px;
+}
+.rec .del:hover { color: var(--red); }
+.list-empty {
+  padding: 24px 8px; text-align: center; opacity: 0.55; font-size: 13px;
+}
+
+/* FAB */
+.fab {
+  position: fixed; right: max(20px, calc(50% - 240px));
+  bottom: 22px; width: 60px; height: 60px;
+  border-radius: 50%; border: 3px solid var(--ink);
+  background: var(--accent); color: #fff;
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 30px; cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+  z-index: 50;
+}
+.fab:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+
+/* Modal */
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px; z-index: 100;
+}
+.modal.show { display: flex; }
+.modal .box {
+  background: #fff; border: 4px solid var(--ink); border-radius: 16px;
+  width: 100%; max-width: 380px;
+  padding: 18px 18px 14px;
+  box-shadow: 6px 6px 0 var(--ink);
+}
+.modal h2 {
+  margin: 0 0 10px;
+  font-family: "Mochiy Pop P One", sans-serif;
+  font-size: 20px; color: var(--accent);
+  -webkit-text-stroke: 2px #fff; paint-order: stroke fill;
+  text-shadow: 2px 2px 0 var(--ink);
+  text-align: center;
+}
+.kind-toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  border: 2px solid var(--ink); border-radius: 999px; padding: 3px;
+  background: #f3e8c8; margin-bottom: 10px;
+}
+.kind-toggle button {
+  background: transparent; border: 0; padding: 8px 0;
+  font-family: "Mochiy Pop P One", sans-serif; font-size: 14px;
+  color: var(--ink); border-radius: 999px; cursor: pointer;
+}
+.kind-toggle button.on.expense { background: var(--red); color: #fff; }
+.kind-toggle button.on.income  { background: var(--green); color: #fff; }
+.field { margin: 8px 0; }
+.field label {
+  display: block; font-size: 11px; opacity: 0.7;
+  margin-bottom: 3px; letter-spacing: 0.05em;
+}
+.field input, .field select, .field textarea {
+  width: 100%;
+  font-family: inherit; font-size: 16px; color: var(--ink);
+  background: #fff8e8; border: 2px solid var(--ink); border-radius: 10px;
+  padding: 8px 10px;
+}
+.field input[type="number"] {
+  font-family: "Mochiy Pop P One", sans-serif;
+  text-align: right;
+}
+.cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.cat-btn {
+  background: #fff8e8; border: 2px solid var(--ink); border-radius: 10px;
+  padding: 6px 2px; cursor: pointer; text-align: center;
+  font-size: 11px; line-height: 1.3;
+}
+.cat-btn .emoji { font-size: 22px; line-height: 1; }
+.cat-btn.on { background: var(--accent-2); }
+.modal .actions {
+  display: flex; gap: 8px; margin-top: 12px;
+}
+.modal .actions button {
+  flex: 1; padding: 10px;
+  font-family: "Mochiy Pop P One", sans-serif; font-size: 15px;
+  border: 2.5px solid var(--ink); border-radius: 10px;
+  cursor: pointer; box-shadow: 2px 2px 0 var(--ink);
+}
+.modal .actions .primary {
+  background: var(--accent); color: #fff;
+}
+.modal .actions .primary:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.modal .actions .secondary { background: #fff; color: var(--ink); }
+.modal .actions .secondary:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.error {
+  background: #ffe5e5; color: var(--red); border: 1.5px solid var(--red);
+  padding: 6px 10px; border-radius: 8px; font-size: 12px; margin-top: 6px;
+}
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translate(-50%, 30px);
+  background: var(--ink); color: #fff;
+  padding: 8px 16px; border-radius: 999px;
+  font-size: 13px; opacity: 0; transition: 0.25s;
+  z-index: 200;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1 class="title">かけいちょ</h1>
+    <div style="display:flex; gap:5px;">
+      <button class="icon-btn" id="btn-share">🔗</button>
+      <button class="icon-btn" id="btn-reset">↺</button>
+    </div>
+  </header>
+
+  <div class="month-bar">
+    <button id="btn-prev">◀</button>
+    <div class="ym" id="ym">2026年04月</div>
+    <button id="btn-next">▶</button>
+  </div>
+
+  <div class="summary">
+    <div class="sum-card income">
+      <div class="lbl">収入</div>
+      <div class="val" id="sum-income">¥0</div>
+    </div>
+    <div class="sum-card expense">
+      <div class="lbl">支出</div>
+      <div class="val" id="sum-expense">¥0</div>
+    </div>
+    <div class="sum-card balance">
+      <div class="lbl">差引</div>
+      <div class="val" id="sum-balance">¥0</div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>カテゴリー別 (支出)</h3>
+    <div id="cat-list"></div>
+  </div>
+
+  <div class="list-wrap">
+    <h3>記録 <span class="count" id="rec-count"></span></h3>
+    <div id="rec-list"></div>
+  </div>
+</div>
+
+<button class="fab" id="btn-add" aria-label="追加">＋</button>
+
+<div class="modal" id="add-modal">
+  <div class="box">
+    <h2 id="modal-title">記録する</h2>
+    <div class="kind-toggle">
+      <button class="kind-btn expense on" data-kind="expense">- 支出</button>
+      <button class="kind-btn income"  data-kind="income">+ 収入</button>
+    </div>
+    <div class="field">
+      <label>カテゴリ</label>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+    <div class="field">
+      <label>金額</label>
+      <input type="number" inputmode="numeric" id="f-amount" placeholder="0" min="1" />
+    </div>
+    <div class="field">
+      <label>日付</label>
+      <input type="date" id="f-date" />
+    </div>
+    <div class="field">
+      <label>メモ（任意）</label>
+      <input type="text" id="f-note" maxlength="60" placeholder="例: スーパーで買い物" />
+    </div>
+    <div class="error" id="form-error" style="display:none"></div>
+    <div class="actions">
+      <button class="secondary" id="btn-cancel">キャンセル</button>
+      <button class="primary"   id="btn-save">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="kakeibo.js" defer></script>
+</body>
+</html>
